@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const Reset_password = () => {
   return (
@@ -16,11 +16,16 @@ const Reset_password = () => {
         className="px-4 py-2 border rounded-md w-full mb-2"
         placeholder="New Password"
       />
+      <input
+        type="password"
+        className="px-4 py-2 border rounded-md w-full mb-2"
+        placeholder="Confirm Password"
+      />
       <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Submit
       </button>
     </div>
   );
-}
+};
 
-export default Reset_password
+export default Reset_password;

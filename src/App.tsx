@@ -85,8 +85,8 @@ function App() {
               userData?.role === "User" ? <Profile /> : <Navigate to="/" />
             }
           />
-          <Route path="/admin-home" element={<AdminHome />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard/>}/>
+          <Route path="/admin-home" element={userData?.role=='Admin'?<AdminHome />:<Navigate to='/login'/>} />
+          <Route path="/admin-dashboard" element={userData?.role=='Admin'?<AdminDashboard/>:<Navigate to ='/login'/>}/>
         </Routes>
       </Router>
     </>

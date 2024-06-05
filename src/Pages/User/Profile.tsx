@@ -11,6 +11,7 @@ import axios from "../../Axios/Axios";
 import { toast } from "react-toastify";
 import defaultProfileImage from "../../assets/monkey.jpg";
 import { CustomImageFileInput } from "../../Components/imageField";
+import { resetPasswordValidationSchema } from "../../FormValidation/ResetPassword";
 
 interface initialValuesType {
   username: string;
@@ -32,6 +33,11 @@ type Users = {
   email: string;
   bio: string;
   profile: string | null;
+};
+type SubmitForm = {
+  currentpassword: string;
+  password: string;
+  cpassword: string;
 };
 interface Image {
   image: string | File | null;
@@ -74,7 +80,6 @@ const Profile = () => {
       const PostEditProfile = await axios.post("/edit-profile-form", formData);
       if (PostEditProfile.data.success) {
         const userGetData = await axios.get("/fetch-user-data");
-        
 
         toast.success("ok");
         dispatch(setUserData(userGetData.data));
@@ -86,13 +91,44 @@ const Profile = () => {
       console.error("Error s");
     }
   };
-  const handleDelete=async()=>{
-    
+  const handleDelete = async (value: string) => {
+    try {
+      console.log(value, "this is the id");
+      const deleteImg = await axios.post("/delete-img", { id: value });
+      if (deleteImg.data.success) {
+        const userAfter = await axios.get("/fetch-user-data");
+        toast.success("Deleted successfully");
+        dispatch(setUserData(userAfter.data));
+      } else {
+        toast.error("Something wrong");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  }
-
-  const handleEditFormw = () => {
-    console.log("hey");
+  const handleEditPassword = async (value: SubmitForm) => {
+    console.log("hey", value);
+    try {
+      const FormData = {
+        oldpasswordd: value.currentpassword,
+        password: value.password,
+        confirm: value.cpassword,
+        email: userData.email,
+      };
+      const changepassword = await axios.post("/change-password", FormData);
+      if (changepassword.data.success) {
+        const userAfter = await axios.get("/fetch-user-data");
+        toast.success("Change successfully");
+        dispatch(setUserData(userAfter.data));
+      } else if (changepassword.data.NotMach) {
+        toast.error("Password des not match");
+      } else if (changepassword.data.Usernotget) {
+        toast.error("Somthing Problem Connect Admin");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   console.log(images, "kokoo");
@@ -112,8 +148,12 @@ const Profile = () => {
         <div className="max-w-3xl w-full p-8 bg-white shadow-md rounded-lg">
           <h1 className="text-3xl font-bold mb-4">Profile</h1>
           <div className="flex justify-between items-center mb-4">
-            <div className="w-1/2">
-              <img src={profileImage} alt="Profile" />
+            <div className="w-1/3">
+              <img
+                src={profileImage}
+                className="items-center border-spacing-7 rounded-md"
+                alt="Profile"
+              />
             </div>
             {/* <input
               type="file"
@@ -190,36 +230,43 @@ const Profile = () => {
                   </Form>
                 )}
               </Formik>
-              {/* <p onClick={() => setShowPassword(!showpassword)}>Cannage</p> */}
+              <p
+                onClick={() => setShowPassword(!showpassword)}
+                className="text-red-700"
+              >
+                ChangePassword
+              </p>
+              <br />
 
               {showpassword && (
                 <Formik
                   initialValues={{
-                    name: "",
-                    string: "",
+                    currentpassword: "",
+                    password: "",
+                    cpassword: "",
                   }}
-                  validationSchema={editProfileValidationSchema}
-                  onSubmit={handleEditFormw}
+                  validationSchema={resetPasswordValidationSchema}
+                  onSubmit={handleEditPassword}
                 >
                   <Form className="flex flex-col">
                     <div className="mb-4">
-                      <Field
+                      {/* <Field
                         type="text"
-                        name="email"
+                        name="currentpassword"
                         className="px-4 py-2 mb-2 border rounded-md w-full hidden "
                         placeholder="New Username"
-                      />
+                      /> */}
                       <label className="block text-gray-700 text-sm font-bold mb-2">
-                        old Password
+                        Current Password
                       </label>
                       <Field
                         type="password"
-                        name="oldpassword"
+                        name="currentpassword"
                         className="px-4 py-2 mb-2 border rounded-md w-full"
-                        placeholder="New Username"
+                        placeholder="Enter your current Password"
                       />
                       <ErrorMessage
-                        name="oldpassword"
+                        name="currentpassword"
                         component="div"
                         className="text-red-500 text-sm"
                       />
@@ -239,12 +286,12 @@ const Profile = () => {
                       />
                       <Field
                         type="password"
-                        name="confirm-password"
+                        name="cpassword"
                         className="px-4 py-2 mb-2 border rounded-md w-full"
                         placeholder="Confirm-Password"
                       />
                       <ErrorMessage
-                        name="confirm-password"
+                        name="cpassword"
                         component="div"
                         className="text-red-500 text-sm"
                       />
@@ -268,7 +315,10 @@ const Profile = () => {
             Edit
           </button> */}
           <CustomImageFileInput onChange={handleImageChange} />
-          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={handleDelete}>
+          <button
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => handleDelete(userDetailFetch._id)}
+          >
             Delete
           </button>
         </div>

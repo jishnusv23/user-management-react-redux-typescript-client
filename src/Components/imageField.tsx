@@ -1,8 +1,6 @@
 import { FC, useRef, ChangeEvent } from "react";
 import { ImageUpload } from "../utils/cloudinary/imageUpload";
-// import { ImageUploadIcon } from "@/components/parts/ImageUploadIcon"; // You may need to create this component
-// import { toast, Toaster } from "sonner";
- // You may need to create this function
+
 
 
 
@@ -35,10 +33,10 @@ export const CustomImageFileInput: FC<CustomImageFileInputProps> = ({
 
       onChange(imageUrl);
     } catch (error) {
-      // toast.error("Image upload failed. Please check the console for details.");
+      
       console.error("Image upload error:", error);
     } finally {
-      // setLoading(false);
+      
     }
   };
 
@@ -47,7 +45,7 @@ export const CustomImageFileInput: FC<CustomImageFileInputProps> = ({
    
       <div className="flex justify-center">
  
-        {/* Use your own component for the image upload icon */}
+        
       </div>
       <p className="text-sm text-gray-400 my-2">
         Click the button below to select an image

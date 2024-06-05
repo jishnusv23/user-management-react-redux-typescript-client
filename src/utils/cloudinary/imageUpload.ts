@@ -15,7 +15,7 @@ export const ImageUpload = async (file: File) => {
 
   try {
     const res = await axios.post(
-      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, // Use 'image/upload' endpoint for image uploads
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, 
       formData
     );
     const { secure_url } = res.data;

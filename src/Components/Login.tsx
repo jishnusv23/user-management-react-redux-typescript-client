@@ -45,11 +45,14 @@ const Login = () => {
         toast.error('email is not correct');
       }else if (response.data.PasswordError){
         toast.error('password des not match')
+      }else if(response.data.statusBlock){
+        toast.error('Admin block this Account')
       }
     } catch (Err) {
       console.log('mistake in login page',Err);
     }
   };
+   
   return (
     <div className="flex justify-center items-center h-screen bg-gray-200">
       <div className="bg-white p-8 rounded-lg shadow-lg">

@@ -1,17 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../Components/Navbar";
 // import profiler_img from "../../assets/img-23.avif";
-import { baseURL } from "../../Constants/Constants ";
+
 import { useSelector } from "react-redux";
-const defaultProfileImage = "/monkey.jpg";
+import defaultProfileImage from "../../assets/monkey.jpg";
 
 const Home = () => {
   const navigate = useNavigate();
   const userDetailFetch = useSelector((state: any) => state.UserData.userData);
-  console.log(userDetailFetch.profile, "thishi");
-  const profileImage = userDetailFetch.profile
-    ? `${baseURL}${userDetailFetch.profile}`
-    : defaultProfileImage;
+
+  const profileImage = userDetailFetch.profile?userDetailFetch.profile:defaultProfileImage
+  
+
   console.log("🚀 ~ file: Home.tsx:13 ~ Home ~ profileImage:", profileImage);
 
   return (
@@ -24,7 +24,6 @@ const Home = () => {
             src={profileImage}
             className="items-center border-spacing-7 rounded-full"
             alt="mokey"
-           
           />
           <button
             className="mt-4 bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600 transition-colors duration-300"

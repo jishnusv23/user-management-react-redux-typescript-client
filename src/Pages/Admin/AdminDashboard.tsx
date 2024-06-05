@@ -4,6 +4,8 @@ import Navbar from "../../Components/Navbar";
 import axios from "../../Axios/Axios";
 import { editUserNameValidationSchema } from "../../FormValidation/EditUsernameAdmin";
 import { AddUserAdminSchema } from "../../FormValidation/AddUserAdminValidation";
+import { AddUSerFrom } from "../../types/AddUserAdmin";
+import { toast } from "react-toastify";
 
 interface initialValuesType {
   username: string;
@@ -23,9 +25,11 @@ const AdminDashboard = () => {
   const [userData, setUserData] = useState<User[]>([]);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
-  const initialValues: initialValuesType = {
-    username: "",
+  const initialValues: AddUSerFrom = {
+    name: "",
     email: "",
+    password: "",
+    confirmPassword: "",
   };
   useEffect(() => {
     const fetchUser = async () => {
@@ -84,8 +88,56 @@ const AdminDashboard = () => {
       console.log(err);
     }
   };
-  const handleAdduser = () => {
-    console.log("working");
+  const handleAdduser = async (value: AddUSerFrom) => {
+    console.log("working", value);
+    const response = await axios.post("/admin/add-user-admin", value);
+    if (response.data.success) {
+      const newUser = await axios.get("/admin/fetch-user-admin");
+      const { data } = newUser;
+      let userAfterAdd: User[] = [];
+
+      if (Array.isArray(data.data)) {
+        userAfterAdd = data.data.map((user: User, index: number) => ({
+          ...user,
+          id: index + 1,
+        }));
+      }
+
+      toast.success("successfully");
+      setUserData(userAfterAdd);
+      setModalOpenAdd(false);
+    } else if (response.data.CheckError) {
+      toast.error("the mail already used");
+      setModalOpenAdd(true);
+    }
+  };
+  const handleDelete = async (_id: string) => {
+    console.log("user is id", _id);
+    try {
+      const userDetail = userData.find((item) => item._id === _id);
+      const confirmDelete = window.confirm(
+        `Are you user delete :${userDetail?.name}`
+      );
+      if (!confirmDelete) return;
+      const response = await axios.post("/admin/delete-user-admin", {
+        data: userDetail?._id,
+      });
+      if (response.data.success) {
+        const newsUser = await axios.get("/admin/fetch-user-admin");
+        const { data } = newsUser;
+        let userAfterDelete: User[] = [];
+        if (Array.isArray(data.data)) {
+          userAfterDelete = data.data.map((user: User, index: number) => ({
+            ...user,
+            id: index + 1,
+          }));
+          toast.success("Successfuly");
+          setUserData(userAfterDelete);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <>
@@ -125,7 +177,7 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {userData.map((user: any, index) => (
+                {userData.map((user: any, index: number) => (
                   <tr key={user._id}>
                     <td className="py-4 px-6 border-b border-gray-200">
                       {user.name}
@@ -143,9 +195,21 @@ const AdminDashboard = () => {
                       >
                         Edit
                       </button>
-                      <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                        Delete
-                      </button>
+                      {user.status == "Active" ? (
+                        <button
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          onClick={() => handleDelete(user._id)}
+                        >
+                          Block
+                        </button>
+                      ) : (
+                        <button
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          onClick={() => handleDelete(user._id)}
+                        >
+                          Unblock
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -233,7 +297,7 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
             <h2 className="text-2xl font-bold mb-4">Add User</h2>
             <Formik
-              initialValues={{}}
+              initialValues={initialValues}
               validationSchema={AddUserAdminSchema}
               onSubmit={handleAdduser}
             >

@@ -9,7 +9,9 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import { editProfileValidationSchema } from "../../FormValidation/ProfileValidation";
 import axios from "../../Axios/Axios";
 import { toast } from "react-toastify";
-import { baseURL } from "../../Constants/Constants ";
+import defaultProfileImage from "../../assets/monkey.jpg";
+import { CustomImageFileInput } from "../../Components/imageField";
+
 interface initialValuesType {
   username: string;
   bio: string;
@@ -20,14 +22,30 @@ const initialValues: initialValuesType = {
 };
 interface fromTyep {
   username: string;
+  email: string;
+  image?: string | null;
   bio: string;
 }
-
+type Users = {
+  _id?: string;
+  name: string;
+  email: string;
+  bio: string;
+  profile: string | null;
+};
+interface Image {
+  image: string | File | null;
+}
 const Profile = () => {
   const [showpassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const userData = useSelector((state: any) => state.UserData.userData);
+  const [images, setImage] = useState<string | null>(null);
+  const userDetailFetch = useSelector((state: any) => state.UserData.userData);
 
+  const profileImage = userDetailFetch.profile
+    ? userDetailFetch.profile
+    : defaultProfileImage;
   // console.log("🚀 ~ file: Profile.tsx:27 ~ Profile ~ userData:", userData);
 
   useEffect(() => {
@@ -39,49 +57,51 @@ const Profile = () => {
       });
     }
   }, [userData]);
-  const handleEditForm = async (value: fromTyep) => {
+  const handleEditForm = async (value: fromTyep, images: string | null) => {
     try {
-      console.log(value);
-      const PostEditProfile = await axios.post("/edit-profile-form", value);
-      const userGetData = await axios.get("/fetch-user-data");
+      // console.log(value, images,"images is here");
+      const formData = {
+        username: value.username,
+        email: value.email,
+        bio: value.bio,
+        images: images,
+      };
       console.log(
-        "🚀 ~ file: Profile.tsx:42 ~ handleEditForm ~ userGetData:",
-        userGetData
+        "🚀 ~ file: Profile.tsx:61 ~ handleEditForm ~ formData:",
+        formData
       );
+      // const newvalue = [value, images];
+      const PostEditProfile = await axios.post("/edit-profile-form", formData);
+      if (PostEditProfile.data.success) {
+        const userGetData = await axios.get("/fetch-user-data");
+        
+
+        toast.success("ok");
+        dispatch(setUserData(userGetData.data));
+      } else {
+        toast.error("showing error");
+      }
       // console.log(Response, "jiji");
     } catch (err) {
       console.error("Error s");
     }
   };
-  const inputProfileRef = useRef<HTMLInputElement>(null);
+  const handleDelete=async()=>{
+    
 
-  const handle_Profile_input = async (event: any) => {
-    const file = event.target.files[0];
-    // console.log("🚀 ~ file: Profile.tsx:60 ~ consthandle_Profile_input= ~ file:", file)
+  }
 
-    try {
-      const formData = new FormData();
-      formData.append("profile", file);
-      const response = await axios.post("/upload-profile-photo", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      if (response.data.success) {
-        toast.success("ok");
-      }
-      const userDetail = await axios.get("/fetch-user-data");
-      dispatch(setUserData(userDetail.data));
-    } catch (err) {
-      console.log("mistkae in here............", err);
-    }
-
-    console.log("Profile image changed");
+  const handleEditFormw = () => {
+    console.log("hey");
   };
 
-  const handleEditProfile = () => {
-    if (inputProfileRef.current) {
-      inputProfileRef.current.click();
+  console.log(images, "kokoo");
+
+  const handleImageChange = (file: string | File | null) => {
+    if (typeof file === "string" || file === null) {
+      setImage(file);
+    } else {
+      console.error("Received unexpected file type:", file);
     }
   };
 
@@ -93,29 +113,37 @@ const Profile = () => {
           <h1 className="text-3xl font-bold mb-4">Profile</h1>
           <div className="flex justify-between items-center mb-4">
             <div className="w-1/2">
-              <img src={baseURL + `/${userData.profile}`} alt="Profile" />
+              <img src={profileImage} alt="Profile" />
             </div>
-            <input
+            {/* <input
               type="file"
               ref={inputProfileRef}
               accept="image/*"
               className="hidden"
               onChange={handle_Profile_input}
-            />
+            /> */}
+            {/* <CustomImageFileInput onChange={handleImageChange} /> */}
 
             <div className="w-1/2">
               <Formik
                 initialValues={{
                   username: userData.name,
                   email: userData.email,
+
                   bio: userData.bio,
                 }}
                 validationSchema={editProfileValidationSchema}
-                onSubmit={handleEditForm}
+                onSubmit={(values) => handleEditForm(values, images)}
               >
                 {({ isSubmitting }) => (
                   <Form className="flex flex-col">
                     <div className="mb-4">
+                      {/* <Field
+                        type="hidden"
+                        name="image"
+                        value={images || ""}
+                        className="px-4 py-2 mb-2 border rounded-md w-full "
+                      /> */}
                       <Field
                         type="text"
                         name="email"
@@ -162,18 +190,85 @@ const Profile = () => {
                   </Form>
                 )}
               </Formik>
-              <p onClick={() => setShowPassword(!showpassword)}>Cannage</p>
-              {showpassword && <Reset_password />}
+              {/* <p onClick={() => setShowPassword(!showpassword)}>Cannage</p> */}
+
+              {showpassword && (
+                <Formik
+                  initialValues={{
+                    name: "",
+                    string: "",
+                  }}
+                  validationSchema={editProfileValidationSchema}
+                  onSubmit={handleEditFormw}
+                >
+                  <Form className="flex flex-col">
+                    <div className="mb-4">
+                      <Field
+                        type="text"
+                        name="email"
+                        className="px-4 py-2 mb-2 border rounded-md w-full hidden "
+                        placeholder="New Username"
+                      />
+                      <label className="block text-gray-700 text-sm font-bold mb-2">
+                        old Password
+                      </label>
+                      <Field
+                        type="password"
+                        name="oldpassword"
+                        className="px-4 py-2 mb-2 border rounded-md w-full"
+                        placeholder="New Username"
+                      />
+                      <ErrorMessage
+                        name="oldpassword"
+                        component="div"
+                        className="text-red-500 text-sm"
+                      />
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-4">
+                        New Password
+                      </label>
+                      <Field
+                        type="password"
+                        name="password"
+                        className="px-4 py-2 mb-2 border rounded-md w-full"
+                        placeholder="Password"
+                      />
+                      <ErrorMessage
+                        name="password"
+                        component="div"
+                        className="text-red-500 text-sm"
+                      />
+                      <Field
+                        type="password"
+                        name="confirm-password"
+                        className="px-4 py-2 mb-2 border rounded-md w-full"
+                        placeholder="Confirm-Password"
+                      />
+                      <ErrorMessage
+                        name="confirm-password"
+                        component="div"
+                        className="text-red-500 text-sm"
+                      />
+                      <button
+                        type="submit"
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </Form>
+                </Formik>
+              )}
             </div>
           </div>
 
-          <button
+          {/* <button
             className="px-4 py-2 mr-4 bg-blue-500 text-white rounded hover:bg-blue-600"
             onClick={handleEditProfile}
           >
             Edit
-          </button>
-          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+          </button> */}
+          <CustomImageFileInput onChange={handleImageChange} />
+          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={handleDelete}>
             Delete
           </button>
         </div>

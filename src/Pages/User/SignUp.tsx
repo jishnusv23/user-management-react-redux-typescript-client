@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loading from "../../Components/Loading";
+import GoogleAuth from "../../Components/GoogleAuthe";
 
 interface singupData {
   name: string;
@@ -30,7 +31,7 @@ const SignUp = () => {
     console.log("hee", userData);
     setLoading(true);
     const response = await axios.post("/Postsignup", userData);
-    // console.log("🚀 ~ file: SignUp.tsx:22 ~ handleSubmit ~ response:", response)
+
     if (response.data.success) {
       console.log("success");
       const FetchuserData = await axios.get("/fetch-user-data");
@@ -157,6 +158,7 @@ const SignUp = () => {
           </Form>
         </Formik>
 
+        <GoogleAuth />
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -170,12 +172,12 @@ const SignUp = () => {
           </div>
 
           <div className="mt-6">
-            <a
-              href="#"
+            <p
               className="text-center block w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              onClick={() => navigate("/login")}
             >
               Sign in
-            </a>
+            </p>
           </div>
         </div>
       </div>

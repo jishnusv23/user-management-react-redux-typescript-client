@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { setUserData } from "../Redux/features/userSlice";
 import { useState } from "react";
 import Loading from "./Loading";
+import GoogleAuth from "./GoogleAuthe";
 interface LoginFormValues {
   email: string;
   password: string;
@@ -22,9 +23,9 @@ interface LoginData {
   password: string;
 }
 const Login = () => {
-  const [loading,setLoading]=useState(false)
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
 
   const handlesubmit = async (loginData: LoginData) => {
     try {
@@ -32,31 +33,29 @@ const Login = () => {
       const response = await axios.post("/login", loginData);
       // console.log("🚀 ~ file: Login.tsx:21 ~ handlesubmit ~ response:", response)
       if (response.data.success) {
-        setLoading(true)
+        setLoading(true);
         toast.success("successfully");
         const UserResponse = await axios.get("/fetch-user-data");
         // console.log("🚀 ~ file: Login.tsx:31 ~ handlesubmit ~ UserResponse:", UserResponse)
-        dispatch(setUserData(UserResponse.data))
-        navigate('/')
-        setLoading(false)
-
-        
-      }else if (response.data.Emailerror){
-        toast.error('email is not correct');
-      }else if (response.data.PasswordError){
-        toast.error('password des not match')
-      }else if(response.data.statusBlock){
-        toast.error('Admin block this Account')
+        dispatch(setUserData(UserResponse.data));
+        navigate("/");
+        setLoading(false);
+      } else if (response.data.Emailerror) {
+        toast.error("email is not correct");
+      } else if (response.data.PasswordError) {
+        toast.error("password des not match");
+      } else if (response.data.statusBlock) {
+        toast.error("Admin block this Account");
       }
     } catch (Err) {
-      console.log('mistake in login page',Err);
+      console.log("mistake in login page", Err);
     }
   };
-   
+
   return (
     <div className="flex justify-center items-center h-screen bg-gray-200">
       <div className="bg-white p-8 rounded-lg shadow-lg">
-        {loading&&<Loading/>}
+        {loading && <Loading />}
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
           Sign In
         </h1>
@@ -109,6 +108,8 @@ const Login = () => {
             Sign Up
           </span>
         </p>
+        <br/>
+        <GoogleAuth />
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ import { setUserData } from "../Redux/features/userSlice";
 import { useState } from "react";
 import Loading from "./Loading";
 import GoogleAuth from "./GoogleAuthe";
+import webdeveloper_img from "../assets/website-developer.jpg";
+import siginImg from '../assets/signin2.png'
 interface LoginFormValues {
   email: string;
   password: string;
@@ -53,65 +55,76 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-200">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        {loading && <Loading />}
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
-          Sign In
-        </h1>
-        <Formik
-          initialValues={initialValues}
-          validationSchema={SignIngValidation}
-          onSubmit={handlesubmit}
-        >
-          <Form>
-            <div className="mb-4">
-              <Field
-                type="email"
-                name="email"
-                placeholder="Email"
-                className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:bg-white focus:border-red-500"
-              />
-              <ErrorMessage
-                name="email"
-                component="div"
-                className="text-red-500 text-sm mt-1"
-              />
-            </div>
-            <div className="mb-4">
-              <Field
-                type="password"
-                name="password"
-                placeholder="Password"
-                className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:bg-white focus:border-red-500"
-              />
-              <ErrorMessage
-                name="password"
-                component="div"
-                className="text-red-500 text-sm mt-1"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:bg-red-600 mb-4"
-            >
+    <>
+      <div className="min-h-screen flex">
+        <div className="flex flex-1 justify-center items-center bg-blue-500 p-10">
+          <div className="max-w-md w-full space-y-8">
+            {loading && <Loading />}
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
               Sign In
-            </button>
-          </Form>
-        </Formik>
-        <p className="text-sm text-gray-600 text-center">
-          Don't have an account?{" "}
-          <span
-            className="text-blue-500 hover:underline"
-            onClick={() => navigate("/signup")}
-          >
-            Sign Up
-          </span>
-        </p>
-        <br/>
-        <GoogleAuth />
+            </h1>
+            <Formik
+              initialValues={initialValues}
+              validationSchema={SignIngValidation}
+              onSubmit={handlesubmit}
+            >
+              <Form>
+                <div className="mb-4">
+                  <Field
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:bg-white focus:border-red-500"
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+                <div className="mb-4">
+                  <Field
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:bg-white focus:border-red-500"
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:bg-red-600 mb-4"
+                >
+                  Sign In
+                </button>
+              </Form>
+            </Formik>
+            <p className="text-sm text-black-600 text-center">
+              Don't have an account?{" "}
+              <span
+                className=" text-xl text-white-500 hover:underline cursor-pointer"
+                onClick={() => navigate("/signup")}
+              >
+                Sign Up
+              </span>
+            </p>
+            <br />
+            <GoogleAuth />
+          </div>
+        </div>
+        <div className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 flex justify-center items-center">
+          <img
+            src={siginImg}
+            alt="Web Developer"
+            className="max-w-full h-auto"
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

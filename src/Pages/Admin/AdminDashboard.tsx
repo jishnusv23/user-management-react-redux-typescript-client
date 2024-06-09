@@ -6,6 +6,7 @@ import { editUserNameValidationSchema } from "../../FormValidation/EditUsernameA
 import { AddUserAdminSchema } from "../../FormValidation/AddUserAdminValidation";
 import { AddUSerFrom } from "../../types/AddUserAdmin";
 import { toast } from "react-toastify";
+import useDebounce from "../../hooks/useDebounce";
 
 interface initialValuesType {
   username: string;
@@ -16,7 +17,7 @@ type User = {
   _id?: string;
   name: string;
   email: string;
-};
+}
 
 const AdminDashboard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -24,6 +25,7 @@ const AdminDashboard = () => {
   const [search, setSearch] = useState("");
   const [userData, setUserData] = useState<User[]>([]);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const debouncevalue=useDebounce(search,500)
 
   const initialValues: AddUSerFrom = {
     name: "",
@@ -35,7 +37,7 @@ const AdminDashboard = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `/admin/fetch-user-admin${search ? `?search=${search}` : " "}`
+          `/admin/fetch-user-admin${debouncevalue ? `?search=${debouncevalue}` : " "}`
         );
         const { data } = response;
         let userWithsearch: User[] = [];
@@ -53,7 +55,7 @@ const AdminDashboard = () => {
       }
     };
     fetchUser();
-  }, [search]);
+  }, [debouncevalue]);
   // console.log(userData, "this is the data");
   // console.log(editingUserId, "get it");
   const selectedUser = userData.find((user) => user?._id === editingUserId);
@@ -63,7 +65,7 @@ const AdminDashboard = () => {
   // );
 
   const handleEdituser = async (value: any) => {
-    console.log("hey working ", value);
+    // console.log("hey working ", value);
     try {
       const newEdituser = await axios.post("/admin/edit-user", value);
       setModalOpen(false);
@@ -177,7 +179,7 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {userData.map((user: any, index: number) => (
+                {userData.map((user:any, index: number) => (
                   <tr key={user._id}>
                     <td className="py-4 px-6 border-b border-gray-200">
                       {user.name}
